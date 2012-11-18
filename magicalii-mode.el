@@ -23,6 +23,7 @@
 ; POSSIBILITY OF SUCH DAMAGE.
 ;
 ; author: michael tesch <tesch@cmrr.umn.edu>
+; with a lot of help from: http://ergoemacs.org/emacs/elisp_basics.html
 ;
 ; to install this mode into your emacs installation, and have it automatically
 ; pick up all files wiht a */maclib/* in their path, add the following to
@@ -40,18 +41,20 @@
     "typeof" "then" "until" "while")
   "Magical keywords.")
 
+;; builtin functions (for which no maclib/ file exists)
 (defvar magical-builtin
   '("exist" "write" "substr" "destroy" "vnmrjcmd" "teststr" "readfile" "create"
-    "format" "string2array" "teststr" "purge" )
+    "format" "string2array" "teststr" "purge" "string" "real" "setlimit" "input")
   "Magical builtin functions.")
 
+; constants should be strings and reals -- todo: check for real & real bounds
 (defvar magical-constant
   '("macro")
   "Magical constant variables.")
 
 (defvar magical-functions
-  '("llAbs" "llAcos" "llAddToLandBanList" "llAddToLandPassList")
-  "LSL functions.")
+  '("blahhh")
+  "Magical functions.")
 
 ;; create the regex string for each class of keywords
 (defvar magical-keywords-regexp (regexp-opt magical-keywords 'words))
@@ -73,8 +76,8 @@
     (,magical-constant-regexp . font-lock-constant-face)
     (,magical-functions-regexp . font-lock-function-name-face)
     (,magical-keywords-regexp . font-lock-keyword-face)
-    ;; note: order above matters. “magical-keywords-regexp” goes last because
-    ;; otherwise the keyword “state” in the function “state_entry”
+    ;; note: order above matters. "magical-keywords-regexp" goes last because
+    ;; otherwise the keyword "state" in the function "state_entry"
     ;; would be highlighted.
 ))
 
@@ -95,6 +98,16 @@
 ;        (modify-syntax-entry ?$ " |_" synTable)
         synTable))
 
+;; indent
+(defun magical-indent-line ()
+  "Indent a line in `magicalii-mode'."
+  (interactive)
+  (beginning-of-line)
+  (if (bobp)  ; Check for beginning of buffer
+      (indent-line-to 0)
+    )
+)
+
 ;; define the mode
 (define-derived-mode magicalii-mode fundamental-mode
   "MagicalII mode"
@@ -103,6 +116,10 @@
 
   ;; code for syntax highlighting
   (setq font-lock-defaults '((magical-font-lock-keywords)))
+
+  ;; setup indent
+  (make-local-variable 'indent-line-function)
+  (setq indent-line-function 'magical-indent-line)
 
   ;; clear memory
   (setq magical-keywords-regexp nil)
