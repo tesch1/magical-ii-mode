@@ -99,9 +99,7 @@
                   (modify-syntax-entry ?\n "> b" synTable))
           (progn(modify-syntax-entry ?\/ ". 124" synTable)
                 (modify-syntax-entry ?* ". 23b" synTable)
-                (modify-syntax-entry ?\n ">" synTable)
-                (message "HELLO")))
-
+                (modify-syntax-entry ?\n ">" synTable)))
         ;; double-quotes are for comments
         ;(modify-syntax-entry ?\" "<" synTable)
         ;; single-quotes are for strings
