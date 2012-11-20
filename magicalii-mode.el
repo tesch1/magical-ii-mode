@@ -29,7 +29,11 @@
 ; pick up all files wiht a */maclib/* in their path, add the following to
 ; your initialization file:
 ;
+; (require magicalii-mode)
+; -or-
 ; (autoload 'magicalii-mode "...path/to/magicalii-mode.el" t)
+;
+; then:
 ; (add-to-list 'auto-mode-alist 
 ;   '(".*/maclib/*." . magicalii-mode))
 ;
@@ -86,9 +90,18 @@
 (setq magical-syntax-table
       (let ((synTable (make-syntax-table)))
         ;; C++ style comment “// ” & “/* ... */” 
-        (modify-syntax-entry ?\/ ". 124b" synTable)
-        (modify-syntax-entry ?* ". 23" synTable)
-        (modify-syntax-entry ?\n "> b" synTable)
+        ;(modify-syntax-entry ?\/ ". 124" synTable)
+        ;(modify-syntax-entry ?* ". 23b" synTable)
+        ;(modify-syntax-entry ?\n ">" synTable)
+        (if (string-match "XEmacs" emacs-version)
+            (progn(modify-syntax-entry ?\/ ". 1456" synTable)
+                  (modify-syntax-entry ?* ". 23" synTable)
+                  (modify-syntax-entry ?\n "> b" synTable))
+          (progn(modify-syntax-entry ?\/ ". 124" synTable)
+                (modify-syntax-entry ?* ". 23b" synTable)
+                (modify-syntax-entry ?\n ">" synTable)
+                (message "HELLO")))
+
         ;; double-quotes are for comments
         ;(modify-syntax-entry ?\" "<" synTable)
         ;; single-quotes are for strings
