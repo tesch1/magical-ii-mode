@@ -13,4 +13,4 @@ your favorite initialization file:
     (add-to-list 'auto-mode-alist 
       '(".*/maclib/*." . magicalii-mode))
 
-and copy the magicalii-mode.el somewhere convenient for you (~/.xemacs/)
+and copy the magicalii-mode.el somewhere convenient (~/.xemacs/)
