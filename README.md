@@ -97,4 +97,4 @@ make corpus CORPUS=~/vnmrsys
 
 ## License
 
-BSD 3-Clause. See [LICENSE](LICENSE).
+GNU General Public License, version 3 or later. See [LICENSE](LICENSE).
