@@ -82,6 +82,17 @@ line of the file:
 make compile   # byte-compile with warnings shown
 make test      # run the ERT tests
 make checkdoc  # check the doc strings
+make corpus    # check every macro in the maclib directories below CORPUS
+```
+
+`make corpus` opens each file in a `maclib` directory below `CORPUS`
+(default `../OpenVnmrJ/src`) in the mode, without changing it. It
+runs font lock and indentation, and reports each file that has
+unclosed strings, comments or parentheses, unbalanced blocks,
+unstable indentation, or a Lisp error. For example:
+
+```sh
+make corpus CORPUS=~/vnmrsys
 ```
 
 ## License

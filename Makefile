@@ -1,6 +1,8 @@
 EMACS ?= emacs
 
-.PHONY: all compile test checkdoc clean
+.PHONY: all compile test checkdoc corpus clean
+
+CORPUS ?= ../OpenVnmrJ/src
 
 all: compile test
 
@@ -12,6 +14,9 @@ test:
 
 checkdoc:
 	$(EMACS) -Q --batch --eval "(checkdoc-file \"magicalii-mode.el\")"
+
+corpus:
+	$(EMACS) -Q --batch -L . -l test/corpus.el $(CORPUS)
 
 clean:
 	rm -f *.elc test/*.elc

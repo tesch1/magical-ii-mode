@@ -102,6 +102,18 @@ return
     (should (magicalii-test-face-p 'font-lock-comment-face "line comment"))
     (should (magicalii-test-face-p 'font-lock-comment-face "block"))))
 
+(ert-deftest magicalii-test-unclosed-quote-comment ()
+  (with-temp-buffer
+    (insert "\"  Modification History\nif $x then\nwft \"note\" f\nendif\n")
+    (magicalii-mode)
+    (font-lock-ensure)
+    (should (magicalii-test-face-p 'font-lock-comment-face "History"))
+    (should (magicalii-test-face-p 'font-lock-keyword-face "if $x"))
+    (should (magicalii-test-face-p 'font-lock-builtin-face "wft"))
+    (should (magicalii-test-face-p 'font-lock-comment-face "note"))
+    (should (magicalii-test-face-p 'font-lock-builtin-face "f\n"))
+    (should (magicalii-test-face-p 'font-lock-keyword-face "endif"))))
+
 (ert-deftest magicalii-test-strings ()
   (magicalii-test-with-sample
     (should (magicalii-test-face-p 'font-lock-string-face "proton"))

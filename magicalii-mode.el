@@ -262,6 +262,20 @@ MAGICAL accepts reserved words in all lower case or all upper case."
     table)
   "Syntax table for `magicalii-mode'.")
 
+(defun magicalii--syntax-propertize (start end)
+  "Make each \" comment between START and END end at the end of its line.
+MAGICAL ends a \" comment at the next \" or at the end of the line,
+whichever comes first."
+  (goto-char start)
+  (while (search-forward "\"" end t)
+    (unless (nth 8 (save-excursion (syntax-ppss (match-beginning 0))))
+      (let ((eol (line-end-position)))
+        (unless (search-forward "\"" eol t)
+          (when (< eol (point-max))
+            (put-text-property eol (1+ eol) 'syntax-table
+                               (string-to-syntax "!")))
+          (goto-char (min end (1+ eol))))))))
+
 ;;;; Font lock
 
 (defun magicalii--statement-start-p (pos)
@@ -362,22 +376,6 @@ PREDICATE gets the start and end of the match."
 
 ;;;; Indentation
 
-(defun magicalii--code-line-p ()
-  "Return non-nil if the current line has code, not only comments."
-  (save-excursion
-    (beginning-of-line)
-    (let ((end (line-end-position))
-          (ppss (syntax-ppss)))
-      (when (nth 8 ppss)
-        (goto-char (nth 8 ppss))
-        (if (nth 4 ppss)
-            (forward-comment 1)
-          (condition-case nil
-              (forward-sexp)
-            (scan-error (goto-char (point-max))))))
-      (forward-comment (buffer-size))
-      (< (point) end))))
-
 (defun magicalii--continued-line-p ()
   "Return non-nil if the previous line ends with a backslash."
   (save-excursion
@@ -418,17 +416,14 @@ PREDICATE gets the start and end of the match."
 Return nil if there is no previous statement."
   (save-excursion
     (beginning-of-line)
-    (let (found)
-      (while (and (not found) (not (bobp)))
-        (forward-line -1)
-        (setq found (magicalii--code-line-p)))
-      (when found
-        (let ((end (line-end-position)))
-          (magicalii--statement-beginning)
-          (+ (current-indentation)
-             (* magicalii-indent-offset
-                (+ (magicalii--block-change (point) end)
-                   (if (looking-at-p magicalii--dedent-regexp) 1 0)))))))))
+    (forward-comment (- (point)))
+    (unless (bobp)
+      (let ((end (line-end-position)))
+        (magicalii--statement-beginning)
+        (+ (current-indentation)
+           (* magicalii-indent-offset
+              (+ (magicalii--block-change (point) end)
+                 (if (looking-at-p magicalii--dedent-regexp) 1 0))))))))
 
 (defun magicalii--calculate-indentation ()
   "Return the column for the current line, or `noindent'."
@@ -541,7 +536,8 @@ The pages come from `magicalii-manual-directory'."
   (setq-local comment-start-skip "\\(?:\"\\|//+\\|/\\*+\\)[ \t]*")
   (setq-local comment-end-skip "[ \t]*\\(?:\"\\|\\*+/\\)")
   (setq-local comment-use-syntax t)
-  (setq-local parse-sexp-ignore-comments t))
+  (setq-local parse-sexp-ignore-comments t)
+  (setq-local syntax-propertize-function #'magicalii--syntax-propertize))
 
 ;;;###autoload
 (add-to-list 'auto-mode-alist '("/maclib/[^/]+\\'" . magicalii-mode))
